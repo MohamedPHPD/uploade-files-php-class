@@ -1,0 +1,103 @@
+<?PHP
+/**
+* create By Eng : Mohamed Moustafa Sayed
+*/
+/*
+ * how to used
+ * 1 - insert table name
+ * 2 - detect operation name = [ins = for insert data , del = for delete data , $delw = for delete data where faild equl = idvalue , sel = select all data from table , selw = to select data where faild equl value match ]
+ * 3 - table fileds
+ * */
+class insert
+{
+    private $table_name_is , $fialdes , $values , $messages_error = array() , $connect ;
+	public function __construct(&$query,$connection,$errors_msg = array())
+    {
+        $this->connect = $connection ;
+        $this->messages_error = $errors_msg ;
+        $cou = count($query) ;
+        $i   = 1 ;
+       foreach ($query as $tbf=>$flv)
+       {
+           if ($tbf == 'tbn'){
+              $this->table_name_is = $flv ;
+           }
+           else
+           {
+
+               $valornot = substr($tbf, -1);
+               if ($valornot == '*')
+               {
+                   if ($cou > $i){
+                       $this->fialdes .= "`".rtrim($tbf,'*')."`," ;
+                       $this->values  .= "'".$flv."'," ;
+
+                   }else if ($cou == $i){
+                       $this->fialdes .= "`".rtrim($tbf,'*')."`" ;
+                       $this->values  .= "'".$flv."'" ;
+                   }
+                   $this->valudates[rtrim($tbf,'*')] = $flv ;
+               }
+               else
+               {
+                   if ($cou > $i){
+                       $this->fialdes .= "`".$tbf."`," ;
+                       $this->values  .= "'".$flv."'," ;
+                   }else if ($cou == $i){
+                       $this->fialdes .= "`".$tbf."`" ;
+                       $this->values  .= "'".$flv."'" ;
+                   }
+
+               }
+           }
+           $i++ ;
+       }// end for each
+        if(count($this->valudates) != 0)
+        {
+            $this->valudate() ;
+        }
+        else
+        {
+            $this->insert() ;
+        }
+     }
+
+    private  function insert()
+    {
+        $insData = mysqli_query($this->connect,"INSERT INTO `$this->table_name_is` ($this->fialdes) VALUES ($this->values)") or die(mysqli_error($this->connect));
+        if ($insData)
+        {
+            return 'done' ;
+        }
+        else
+        {
+            return 'error' ;
+        }
+    }
+
+
+    private  function valudate()
+    {
+        $coun = count($this->valudates) ;
+        $i = 0 ;
+        foreach ($this->valudates as $key => $values)
+        {
+            if ($values == '')
+            {
+                if (isset($this->messages_error[$key]))
+                {
+                    echo $this->messages_error[$key];
+                }else echo 'حقل ال ' .$key . 'لا يجب ان يكون فارغ ' ;
+            }else
+            {
+                $i ++ ;
+            }
+        }
+        if ($i == $coun)
+        {
+            $this->insert();
+        }
+    }
+
+}
+?>
