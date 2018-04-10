@@ -59,12 +59,12 @@ class upload
             }
             else
             {
-                return ("فشلت عملية رفع الصورة")                          ;
+                return (" Success Uploade File")                            ;
             }
         }
         else
         {
-            return ("صيغة الصورة غير مدعومة")                             ;
+            return ("uploaded file is failde")                              ;
         }
     }
     private function rename_mix($length = 32)
