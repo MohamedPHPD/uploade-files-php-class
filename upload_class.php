@@ -1,11 +1,10 @@
 <?php
 class upload
 {
-
     public function __construct($directory , $fileName  , $nameType = 'd' , $pref = 'd' , $length_name = 10  , &$allow = 'd')
     {
         // extentions detected
-        $path_info   = pathinfo($fileName)     ;
+        $path_info   = pathinfo($fileName['name'])     ;
         $extention   = $path_info['extension'] ;
         // extentions default allow
         if ($allow   == 'd' || $allow == '') {$allow = array('jpg','jpeg','png','gif');} else {$allow = $allow;}
@@ -21,40 +20,33 @@ class upload
         // name type == prefix
         elseif($nameType == 'pref')
         {if($pref    != 'd'  || $pref == ''){/*if detect prefix*/$new_name = $pref.'_'.$this->rename_mix($length_name);}
-            else {/* if choose name pref and not detect pref*/$new_name = $this->rename_mix($length_name);}
+        else {/* if choose name pref and not detect pref*/$new_name = $this->rename_mix($length_name);}
         }
         // original file name
         elseif($nameType == 'org') {$new_name = $fileName['name'];}
-
-
-
         if (in_array($extention , $allow))
         {
-           echo 'its Allow <br>' ;
-           echo $new_name ;
-           $new_name = $this->rename_mix().'.'.$extention;
-           $dectins = $directory.$new_name ;
-           $muf = move_uploaded_file($fileName['tmp_name'],$dectins);
+            $dectins = $directory.'/'.$new_name.'.'.$extention ;
 
-           if ($muf)
-           {
-               return $dectins ;
-           }
-           else
-           {
+
+            $muf = move_uploaded_file($fileName['tmp_name'],$dectins);
+            chmod($dectins, 0644);
+            if ($muf)
+            {
+                return $dectins ;
+            }
+            else
+            {
                 return ("فشلت عملية رفع الصورة");
-           }
+            }
         }
         else
         {
-                return ("صيغة الصورة غير مدعومة");
+            return ("صيغة الصورة غير مدعومة");
         }
     }
-
-
     private function rename_mix($length = 32)
     {
-
         $random_string="";
         while(strlen($random_string)<$length && $length > 0) {
             $randnum = mt_rand(9,61);
@@ -62,8 +54,6 @@ class upload
         }
         return $random_string;
     }
-
-
     private function rename_str($length = 10) {
         $characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
@@ -73,5 +63,4 @@ class upload
         }
         return $randomString;
     }
-
 }
